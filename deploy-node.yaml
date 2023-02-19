@@ -1,6 +1,6 @@
 ---
 - name: Install npm and node
-  hosts: "{{host_ip_addr}}"
+  hosts: node_server
   vars_files:
     - project-vars
   tasks:
@@ -20,9 +20,9 @@
       become: true
 
 - name: Create User
+  hosts: node_server
   vars_files:
     - project-vars
-  hosts: "{{host_ip_addr}}"
   tasks:
   - name: creating linux user
     user:
@@ -31,7 +31,7 @@
     become: true
 
 - name: Deploy nodejs
-  hosts: "{{host_ip_addr}}"
+  hosts: node_server
   become: true
   become_user: "{{linux_name}}"
   vars_files:
