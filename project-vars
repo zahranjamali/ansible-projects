@@ -1,0 +1,5 @@
+linux_name: zeej
+user_home_directory: /home/{{linux_name}}
+location: /home/zahran/myproject/test-node-app/
+version: 1.0.0
+host_ip_addr: 65.0.185.95

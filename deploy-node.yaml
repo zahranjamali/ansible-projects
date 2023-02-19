@@ -1,0 +1,56 @@
+---
+- name: Install npm and node
+  hosts: "{{host_ip_addr}}"
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Update apt repo and cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+        install_recommends: yes
+      become: true
+    - name: Install npm and node
+      apt:
+        pkg:
+          - nodejs
+          - npm
+        install_recommends: yes
+      become: true
+
+- name: Create User
+  vars_files:
+    - project-vars
+  hosts: "{{host_ip_addr}}"
+  tasks:
+  - name: creating linux user
+    user:
+      name: "{{linux_name}}"
+      group: admin
+    become: true
+
+- name: Deploy nodejs
+  hosts: "{{host_ip_addr}}"
+  become: true
+  become_user: "{{linux_name}}"
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Unpack the nodejs file
+      unarchive:
+          src: "{{location}}/nodejs-app-{{version}}.tgz"
+          dest: "{{user_home_directory}}"
+    - name: Install dependencies
+      npm:
+        path: "{{user_home_directory}}/package"
+    - name: Start the  application
+      command:
+        chdir: "{{user_home_directory}}/package/app"
+        cmd: node server
+      async: 1000
+      poll: 0
+    - name: Ensure application is working
+      shell: ps aux | grep node
+      register: app_status
+    - debug: msg={{app_status}}
