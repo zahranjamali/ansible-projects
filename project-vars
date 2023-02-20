@@ -2,3 +2,4 @@ linux_name: zeej
 user_home_directory: /home/{{linux_name}}
 location: /home/zahran/myproject/test-node-app/
 version: 1.0.0
+dockerhub_password: Samsung@2corby

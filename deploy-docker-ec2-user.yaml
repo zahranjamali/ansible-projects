@@ -1,0 +1,57 @@
+---
+- name: Installing prerequisites
+  hosts: docker_server
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Ensure Docker is installed
+      vars:
+        ansible_python_interpreter: /usr/bin/python
+      yum:
+        name: docker
+        update_cache: yes
+        state: present
+    - name: Ensure Docker Compose is installed
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    - name: Make sure docker daemon is started 
+      systemd:
+        name: docker
+        state: started
+    - name: Ensure ec2-user is added to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: true
+    - name: Reset connection
+      meta: reset_connection
+    - name: Make sure docker python module is installed
+      pip:
+        name: 
+          - docker
+          - docker-compose
+
+- name: Docker pull testing
+  hosts: docker_server
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Make sure docker.compose file is copyed to remote server
+      ansible.builtin.copy:
+        src: /home/zahran/docker-compose.yaml
+        dest: /home/ec2-user
+    - name: Ensure dockerhub login
+      community.docker.docker_login:
+        registry_url: https://index.docker.io/v1
+        username: zahranjamali
+        password: "{{dockerhub_password}}" #password in project-vars on host machine
+    - name: Ensure docker-compose is running
+      community.docker.docker_compose:
+        project_src: /home/ec2-user
+        state: present
+
+        
+
+    
