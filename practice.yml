@@ -1,0 +1,17 @@
+- name: Website deployment
+  hosts: localhost
+  tasks:
+    - name: httpd install
+      package:
+        name: "httpd"
+        state: "present"
+
+    - name: copy website files
+      copy:
+        src: "/home/zahran.html"
+        dest: "/var/wwww/html/"
+
+    - name: httpd service restart
+      service:
+        name: "httpd"
+        state: "started"      
